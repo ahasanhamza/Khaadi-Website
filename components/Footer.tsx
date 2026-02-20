@@ -1,4 +1,6 @@
+'use client'
 // components/Footer.tsx
+// 'use client' required: has onSubmit event handler on newsletter form
 import Link from 'next/link'
 
 export default function Footer() {
@@ -11,7 +13,10 @@ export default function Footer() {
             <h3 className="font-serif text-2xl mb-1">Join the Aura Circle</h3>
             <p className="text-white/60 font-body text-sm">Exclusive offers, new arrivals and style inspirations.</p>
           </div>
-          <form className="flex w-full md:w-auto gap-0" onSubmit={(e) => e.preventDefault()}>
+          <form
+            className="flex w-full md:w-auto gap-0"
+            onSubmit={(e) => e.preventDefault()}
+          >
             <input
               type="email"
               placeholder="Your email address"
@@ -47,10 +52,16 @@ export default function Footer() {
         <div>
           <h4 className="text-[10px] tracking-[0.3em] uppercase font-body text-aura-gold mb-5">Shop</h4>
           <ul className="space-y-3">
-            {['New Arrivals', 'Unstitched', 'Ready-to-Wear', 'Accessories', 'Sale'].map((item) => (
-              <li key={item}>
-                <Link href="/products" className="text-white/60 hover:text-white font-body text-xs transition-colors">
-                  {item}
+            {[
+              { label: 'New Arrivals', href: '/products?filter=new' },
+              { label: 'Unstitched', href: '/products?category=Unstitched' },
+              { label: 'Ready-to-Wear', href: '/products?category=Ready-to-Wear' },
+              { label: 'Accessories', href: '/products?category=Accessories' },
+              { label: 'Sale', href: '/products?filter=sale' },
+            ].map((item) => (
+              <li key={item.label}>
+                <Link href={item.href} className="text-white/60 hover:text-white font-body text-xs transition-colors">
+                  {item.label}
                 </Link>
               </li>
             ))}

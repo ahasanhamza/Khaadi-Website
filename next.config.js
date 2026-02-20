@@ -14,11 +14,8 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000'],
-    },
-  },
+  // serverActions is stable in Next.js 14 — no experimental wrapper needed.
+  // Removed experimental.serverActions to prevent build warning.
 }
 
 module.exports = nextConfig

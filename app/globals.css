@@ -1,0 +1,204 @@
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-playfair: 'Playfair Display', Georgia, serif;
+    --font-cormorant: 'Cormorant Garamond', Garamond, serif;
+    --font-lato: 'Lato', 'Helvetica Neue', sans-serif;
+  }
+
+  * {
+    border-radius: 0 !important;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-lato);
+    background-color: #FAFAFA;
+    color: #0A0A0A;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .font-serif {
+    font-family: var(--font-playfair) !important;
+  }
+
+  .font-sans {
+    font-family: var(--font-cormorant) !important;
+  }
+
+  .font-body {
+    font-family: var(--font-lato) !important;
+  }
+}
+
+@layer components {
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply bg-aura-black text-aura-white px-8 py-3 text-xs font-body tracking-[0.2em] uppercase
+           transition-all duration-300 hover:bg-aura-charcoal active:scale-[0.98]
+           border border-aura-black;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-aura-black px-8 py-3 text-xs font-body tracking-[0.2em] uppercase
+           transition-all duration-300 hover:bg-aura-black hover:text-aura-white
+           border border-aura-black;
+  }
+
+  .btn-gold {
+    @apply bg-aura-gold text-aura-white px-8 py-3 text-xs font-body tracking-[0.2em] uppercase
+           transition-all duration-300 hover:bg-aura-gold-dark active:scale-[0.98]
+           border border-aura-gold;
+  }
+
+  /* ── Product Cards ── */
+  .product-card {
+    @apply group relative bg-white overflow-hidden cursor-pointer;
+  }
+
+  .product-card:hover .product-card-image {
+    @apply scale-105;
+  }
+
+  .product-card-image {
+    @apply transition-transform duration-700 ease-out w-full object-cover;
+  }
+
+  .product-badge {
+    @apply absolute top-3 left-3 text-[10px] tracking-[0.15em] uppercase font-body
+           px-2 py-1 z-10;
+  }
+
+  .badge-new {
+    @apply bg-aura-black text-aura-white;
+  }
+
+  .badge-sale {
+    @apply bg-aura-accent text-aura-white;
+  }
+
+  /* ── Form Inputs ── */
+  .input-luxury {
+    @apply w-full border border-aura-border px-4 py-3 text-sm font-body
+           focus:outline-none focus:border-aura-black transition-colors duration-200
+           bg-white placeholder:text-aura-muted;
+  }
+
+  .select-luxury {
+    @apply w-full border border-aura-border px-4 py-3 text-sm font-body
+           focus:outline-none focus:border-aura-black transition-colors duration-200
+           bg-white appearance-none cursor-pointer;
+  }
+
+  /* ── Section Headers ── */
+  .section-header {
+    @apply text-center mb-12;
+  }
+
+  .section-label {
+    @apply text-xs tracking-[0.3em] uppercase font-body text-aura-gold mb-3 block;
+  }
+
+  .section-title {
+    @apply font-serif text-3xl md:text-4xl text-aura-black;
+  }
+
+  .section-divider {
+    @apply w-16 h-px bg-aura-gold mx-auto mt-4;
+  }
+
+  /* ── Navigation ── */
+  .nav-link {
+    @apply text-xs tracking-[0.15em] uppercase font-body text-aura-charcoal
+           hover:text-aura-gold transition-colors duration-200 py-1;
+  }
+
+  /* ── Mega Menu ── */
+  .mega-menu {
+    @apply absolute top-full left-0 w-screen bg-white shadow-luxury-lg
+           border-t border-aura-border z-50 opacity-0 invisible
+           transition-all duration-300 translate-y-2;
+  }
+
+  .mega-menu-open {
+    @apply opacity-100 visible translate-y-0;
+  }
+
+  /* ── Hero ── */
+  .hero-slide {
+    @apply relative w-full h-[85vh] overflow-hidden;
+  }
+
+  /* ── Swiper Overrides ── */
+  .swiper-pagination-bullet {
+    background: rgba(255,255,255,0.6) !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 0 !important;
+  }
+
+  .swiper-pagination-bullet-active {
+    background: white !important;
+    width: 24px !important;
+  }
+
+  /* ── Price Display ── */
+  .price-display {
+    @apply font-body text-aura-black;
+  }
+
+  .price-sale {
+    @apply text-aura-accent font-bold;
+  }
+
+  .price-original {
+    @apply line-through text-aura-muted text-sm;
+  }
+
+  /* ── Cart Sidebar ── */
+  .cart-sidebar {
+    @apply fixed top-0 right-0 h-full w-full md:w-[400px] bg-white z-[100]
+           shadow-luxury-lg transform translate-x-full transition-transform duration-400 ease-out;
+  }
+
+  .cart-sidebar-open {
+    @apply translate-x-0;
+  }
+
+  /* ── Overlay ── */
+  .overlay {
+    @apply fixed inset-0 bg-black/40 z-[90] opacity-0 invisible transition-all duration-300;
+  }
+
+  .overlay-visible {
+    @apply opacity-100 visible;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

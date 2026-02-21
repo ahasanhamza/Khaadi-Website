@@ -1,3 +1,4 @@
+// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -5,17 +6,23 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'plus.unsplash.com',
+        port: '',
         pathname: '/**',
       },
     ],
+    // Remove 'unoptimized: true' once you've confirmed images load.
+    // Keep it if you still see upstream 404s from Unsplash's image API.
+    // unoptimized: true,
   },
-  // serverActions is stable in Next.js 14 — no experimental wrapper needed.
-  // Removed experimental.serverActions to prevent build warning.
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+  },
 }
 
 module.exports = nextConfig

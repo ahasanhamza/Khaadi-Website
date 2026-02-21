@@ -1,116 +1,48 @@
-'use client'
-// components/Footer.tsx
-// 'use client' required: has onSubmit event handler on newsletter form
 import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="bg-aura-black text-white mt-20">
+    <footer className="bg-[#0A0A0A] text-white/70">
       {/* Newsletter */}
-      <div className="border-b border-white/10">
-        <div className="max-w-screen-xl mx-auto px-8 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h3 className="font-serif text-2xl mb-1">Join the Aura Circle</h3>
-            <p className="text-white/60 font-body text-sm">Exclusive offers, new arrivals and style inspirations.</p>
-          </div>
-          <form
-            className="flex w-full md:w-auto gap-0"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="input-luxury flex-1 md:w-72 bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:border-aura-gold"
-            />
-            <button type="submit" className="btn-gold px-6 py-3 whitespace-nowrap text-xs tracking-widest">
-              Subscribe
-            </button>
-          </form>
+      <div className="border-b border-white/10 py-10 px-4 text-center">
+        <p className="font-['Playfair_Display'] text-2xl text-white mb-2">Join the Aura Circle</p>
+        <p className="text-sm mb-6">New arrivals, exclusive offers, style inspiration.</p>
+        <div className="flex max-w-md mx-auto gap-0">
+          <input type="email" placeholder="your@email.com"
+            className="flex-1 bg-white/10 border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#C9A96E]" />
+          <button className="bg-[#C9A96E] text-[#0A0A0A] text-xs tracking-widest uppercase px-6 py-3 hover:bg-white transition-colors font-medium">
+            Subscribe
+          </button>
         </div>
       </div>
 
       {/* Links */}
-      <div className="max-w-screen-xl mx-auto px-8 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div>
-          <h4 className="font-serif text-lg mb-5 tracking-wide">Aura</h4>
-          <p className="text-white/50 font-body text-xs leading-relaxed">
-            Premium South Asian fashion crafted with heritage and delivered across Bangladesh.
-          </p>
-          <div className="mt-4 flex gap-3">
-            {['Facebook', 'Instagram', 'Pinterest'].map((s) => (
-              <a
-                key={s}
-                href="#"
-                className="text-[10px] font-body tracking-widest text-white/40 hover:text-aura-gold transition-colors uppercase"
-              >
-                {s}
-              </a>
-            ))}
+          <p className="font-['Playfair_Display'] text-xl text-white mb-4">AURA</p>
+          <p className="text-xs leading-relaxed">Premium South Asian fashion, crafted for the modern woman. Delivered across Bangladesh.</p>
+        </div>
+
+        {[
+          { title: 'Shop', links: [{ l: 'Unstitched', h: '/products?category=Unstitched' }, { l: 'Ready-to-Wear', h: '/products?category=Ready-to-Wear' }, { l: 'Lawn', h: '/products?category=Lawn' }, { l: 'Khaddar', h: '/products?category=Khaddar' }, { l: 'Accessories', h: '/products?category=Accessories' }, { l: 'Sale', h: '/products?filter=sale' }] },
+          { title: 'Help', links: [{ l: 'Help Centre', h: '/help' }, { l: 'Size Guide', h: '/size-guide' }, { l: 'Delivery Info', h: '/delivery-info' }, { l: 'Returns & Exchange', h: '/returns-and-exchange' }, { l: 'Track Order', h: '/track-order' }, { l: 'Contact Us', h: '/contact-us' }] },
+          { title: 'Company', links: [{ l: 'Privacy Policy', h: '/privacy-policy' }, { l: 'Terms & Conditions', h: '/terms' }, { l: 'Sitemap', h: '/sitemap.xml' }] },
+        ].map(({ title, links }) => (
+          <div key={title}>
+            <p className="text-xs tracking-widest uppercase text-white mb-4">{title}</p>
+            <ul className="space-y-2">
+              {links.map(({ l, h }) => (
+                <li key={l}>
+                  <Link href={h} className="text-xs hover:text-[#C9A96E] transition-colors">{l}</Link>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-
-        <div>
-          <h4 className="text-[10px] tracking-[0.3em] uppercase font-body text-aura-gold mb-5">Shop</h4>
-          <ul className="space-y-3">
-            {[
-              { label: 'New Arrivals', href: '/products?filter=new' },
-              { label: 'Unstitched', href: '/products?category=Unstitched' },
-              { label: 'Ready-to-Wear', href: '/products?category=Ready-to-Wear' },
-              { label: 'Accessories', href: '/products?category=Accessories' },
-              { label: 'Sale', href: '/products?filter=sale' },
-            ].map((item) => (
-              <li key={item.label}>
-                <Link href={item.href} className="text-white/60 hover:text-white font-body text-xs transition-colors">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-[10px] tracking-[0.3em] uppercase font-body text-aura-gold mb-5">Help</h4>
-          <ul className="space-y-3">
-            {['Size Guide', 'Delivery Info', 'Returns & Exchange', 'Track Order', 'Contact Us'].map((item) => (
-              <li key={item}>
-                <Link href="#" className="text-white/60 hover:text-white font-body text-xs transition-colors">
-                  {item}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-[10px] tracking-[0.3em] uppercase font-body text-aura-gold mb-5">Bangladesh</h4>
-          <ul className="space-y-3 text-white/60 font-body text-xs">
-            <li>📍 Dhaka, Bangladesh</li>
-            <li>📞 +880 1700-000000</li>
-            <li>✉️ hello@aura.com.bd</li>
-            <li className="pt-2">
-              <span className="text-aura-gold">Payment:</span> COD · SSLCommerz · bKash
-            </li>
-            <li>
-              <span className="text-aura-gold">Delivery:</span> 3–5 working days
-            </li>
-          </ul>
-        </div>
+        ))}
       </div>
 
-      {/* Bottom */}
-      <div className="border-t border-white/10 px-8 py-5">
-        <div className="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className="text-white/30 font-body text-[11px] tracking-widest uppercase">
-            © 2025 Aura Fashion Ltd. Bangladesh
-          </p>
-          <div className="flex gap-4">
-            {['Privacy', 'Terms', 'Sitemap'].map((l) => (
-              <Link key={l} href="#" className="text-white/30 hover:text-white/70 font-body text-[11px] tracking-wider transition-colors">
-                {l}
-              </Link>
-            ))}
-          </div>
-        </div>
+      <div className="border-t border-white/10 py-5 px-4 text-center text-xs">
+        © {new Date().getFullYear()} Aura Fashion House, Dhaka, Bangladesh. All rights reserved.
       </div>
     </footer>
   )

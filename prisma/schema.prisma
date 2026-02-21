@@ -1,4 +1,6 @@
 // prisma/schema.prisma
+// SQLite does NOT support enums. Role is stored as String: "USER" | "ADMIN"
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,57 +10,132 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("USER")
+  phone         String?
+  address       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  orders    Order[]
+  wishlists Wishlist[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 model Product {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
-  description String
+  description String?
+  category    String
   price       Float
   salePrice   Float?
   imageUrl    String
-  images      String   @default("[]") // JSON array stored as string
-  category    String   // "Unstitched" | "Ready-to-Wear" | "Accessories" | "Lawn" | "Khaddar" | "Linen"
-  subCategory String?
+  images      String   @default("[]")
   fabric      String?
-  colors      String   @default("[]") // JSON array
-  sizes       String   @default("[]") // JSON array
+  colors      String   @default("[]")
+  sizes       String   @default("[]")
   stock       Int      @default(100)
   isFeatured  Boolean  @default(false)
-  isNew       Boolean  @default(true)
+  isNew       Boolean  @default(false)
   isSale      Boolean  @default(false)
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  orderItems  OrderItem[]
+
+  orderItems OrderItem[]
+  wishlists  Wishlist[]
 }
 
 model Order {
-  id              String      @id @default(cuid())
-  orderNumber     String      @unique
-  customerName    String
-  customerEmail   String
-  customerPhone   String
-  shippingAddress String      // JSON string
-  items           OrderItem[]
-  subtotal        Float
-  shippingCost    Float       @default(80)
-  total           Float
-  paymentMethod   String      // "COD" | "SSLCommerz"
-  paymentStatus   String      @default("Pending") // "Pending" | "Paid" | "Failed"
-  orderStatus     String      @default("Processing") // "Processing" | "Confirmed" | "Shipped" | "Delivered" | "Cancelled"
-  sslTransId      String?
-  notes           String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id            String   @id @default(cuid())
+  orderNumber   String   @unique
+  userId        String?
+  customerName  String
+  customerEmail String
+  customerPhone String
+  address       String
+  city          String
+  postalCode    String?
+  paymentMethod String   @default("COD")
+  paymentStatus String   @default("Pending")
+  orderStatus   String   @default("Processing")
+  subtotal      Float
+  shipping      Float    @default(0)
+  total         Float
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderItems OrderItem[]
 }
 
 model OrderItem {
   id        String  @id @default(cuid())
   orderId   String
   productId String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  imageUrl  String
+  price     Float
   quantity  Int
   size      String?
   color     String?
-  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
 }

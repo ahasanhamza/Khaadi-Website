@@ -1,7 +1,9 @@
-// next.config.js
+// next.config.js — replace your existing file entirely
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    // Prevents upstream 504/404 errors from Unsplash CDN
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,13 +17,18 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'source.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
-    // Remove 'unoptimized: true' once you've confirmed images load.
-    // Keep it if you still see upstream 404s from Unsplash's image API.
-    // unoptimized: true,
   },
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+    serverActions: {
+      allowedOrigins: ['localhost:3000'],
+    },
   },
 }
 

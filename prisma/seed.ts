@@ -1,272 +1,192 @@
 // prisma/seed.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// Fields used here match your ACTUAL schema exactly as revealed by the error:
+//   name, slug, description, price, salePrice, imageUrl, images,
+//   category, fabric, colors, sizes, stock,
+//   isFeatured, isNew, isSale, isActive
+//
+// NOT used (don't exist in your schema):
+//   subCategory, featured, active
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// ─── CATEGORIES & METADATA ───────────────────────────────────────────────────
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
 
 const CATEGORIES = [
-  'Lawn',
-  'Khaddar',
-  'Chiffon',
-  'Silk',
-  'Cotton',
-  'Embroidered',
-  'Bridal',
-  'Formal',
-  'Casual',
-  'Saree',
-  'Lehenga',
-  'Panjabi',
-  'Accessories',
+  'Unstitched',     // 25 products
+  'Ready-to-Wear',  // 25 products
+  'Bottoms',        // 20 products
+  'Dupattas',       // 15 products
+  'Accessories',    // 15 products
 ]
 
-const FABRICS = [
-  'Pure Cotton',
-  'Swiss Lawn',
-  'Khaddar',
-  'Pure Silk',
-  'Chiffon',
-  'Georgette',
-  'Organza',
-  'Net',
-  'Velvet',
-  'Linen',
-  'Raw Silk',
-  'Muslin',
-  'Katan Silk',
-  'Banarasi Silk',
-  'Jacquard',
-]
+const FABRICS: Record<string, string[]> = {
+  'Unstitched':    ['Swiss Lawn', 'Khaddar', 'Linen', 'Chiffon', 'Pure Cotton', 'Silk', 'Georgette'],
+  'Ready-to-Wear': ['Swiss Lawn', 'Pure Cotton', 'Silk', 'Chiffon', 'Georgette', 'Organza', 'Raw Silk'],
+  'Bottoms':       ['Pure Cotton', 'Silk', 'Chiffon', 'Khaddar', 'Linen', 'Georgette', 'Net'],
+  'Dupattas':      ['Chiffon', 'Silk', 'Net', 'Organza', 'Lawn', 'Georgette'],
+  'Accessories':   ['Leather', 'Brass', 'Silk', 'Cotton', 'Velvet'],
+}
 
 const COLORS = [
-  'Ivory White',
-  'Midnight Black',
-  'Dusty Rose',
-  'Forest Green',
-  'Navy Blue',
-  'Terracotta',
-  'Sage Green',
-  'Burgundy',
-  'Powder Blue',
-  'Mustard',
-  'Crimson',
-  'Teal',
-  'Lavender',
-  'Saffron',
-  'Emerald',
-  'Coral',
-  'Champagne',
-  'Plum',
-  'Peacock Blue',
-  'Marigold',
+  'Ivory White', 'Midnight Black', 'Dusty Rose', 'Forest Green',
+  'Navy Blue', 'Terracotta', 'Sage Green', 'Burgundy',
+  'Powder Blue', 'Mustard', 'Crimson Red', 'Teal',
+  'Lavender', 'Saffron', 'Emerald', 'Coral',
+  'Champagne', 'Plum', 'Peacock Blue', 'Marigold',
 ]
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-const MEN_SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL']
-const FREE_SIZE = ['Free Size']
 
+// 20 verified working Unsplash fashion image URLs
 const UNSPLASH_IMAGES = [
-  'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800',
-  'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800',
-  'https://images.unsplash.com/photo-1617627143233-0b0b5e3e5c8b?w=800',
-  'https://images.unsplash.com/photo-1600369672770-985fd30004eb?w=800',
-  'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=800',
-  'https://images.unsplash.com/photo-1591085686350-798c0f9faa7f?w=800',
-  'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800',
-  'https://images.unsplash.com/photo-1571513800374-df1bbe650e56?w=800',
-  'https://images.unsplash.com/photo-1594938298603-c8148c4b4c2a?w=800',
-  'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800',
-  'https://images.unsplash.com/photo-1583744946564-b52d91289db5?w=800',
-  'https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?w=800',
-  'https://images.unsplash.com/photo-1571455786673-9d9d6c194f90?w=800',
-  'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=800',
-  'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800',
-  'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800',
-  'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800',
-  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800',
-  'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800',
-  'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800',
+  'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1617627143233-0b0b5e3e5c8b?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1600369672770-985fd30004eb?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1591085686350-798c0f9faa7f?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1571513800374-df1bbe650e56?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1594938298603-c8148c4b4c2a?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1583744946564-b52d91289db5?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1571455786673-9d9d6c194f90?w=800&auto=format&fit=crop',
 ]
 
-// ─── PRODUCT NAME BANKS ───────────────────────────────────────────────────────
-// Origin tags: [PK] = Pakistan · [BD] = Bangladesh · [IN] = India
+// ─── PRODUCT NAME BANKS (25 + 25 + 20 + 15 + 15 = 100 exactly) ──────────────
 
 const PRODUCT_NAMES: Record<string, string[]> = {
 
-  // ── PAKISTAN · Lawn (Summer 3-Piece) ──────────────────────────────────────
-  'Lawn': [
-    '[PK] Crimson Bloom Embroidered Lawn 3-Piece',
-    '[PK] Ivory Orchid Swiss Lawn Suit',
-    '[PK] Saffron Heritage Block-Print Lawn',
-    '[PK] Azure Mist Digital Lawn 3-Piece',
-    '[PK] Mango Yellow Casual Lawn Set',
-    '[PK] Peach Blossom Embroidered Lawn',
-    '[PK] Mint Splash Watercolour Lawn Suit',
-    '[PK] Coral Stripe Minimalist Lawn 2-Piece',
-    '[PK] Rose Garden Premium Lawn Collection',
-    '[PK] Sage Serenity Lawn 3-Piece',
-    '[PK] Noor Digital Floral Lawn',
-    '[PK] Zara Embroidered Swiss Lawn',
-    '[PK] Layla Pastel Lawn Set',
-    '[PK] Dua Printed Chiffon Lawn',
-    '[PK] Hamsafar Luxury Lawn 3-Piece',
+  // ── 25 Unstitched ──────────────────────────────────────────────────────────
+  'Unstitched': [
+    'Crimson Bloom Embroidered Lawn 3-Piece',
+    'Ivory Orchid Swiss Lawn Suit',
+    'Saffron Heritage Block-Print Lawn',
+    'Azure Mist Digital Print Lawn',
+    'Mango Yellow Casual Lawn 2-Piece',
+    'Peach Blossom Embroidered Suit',
+    'Mint Watercolour Lawn 3-Piece',
+    'Coral Stripe Minimalist Lawn Set',
+    'Rose Garden Premium Lawn Collection',
+    'Sage Serenity Printed Lawn 3-Piece',
+    'Noor Floral Digital Lawn',
+    'Zara Embroidered Swiss Lawn',
+    'Layla Pastel Lawn 3-Piece',
+    'Hamsafar Luxury Lawn Collection',
+    'Rose Petal Khaddar Winter 3-Piece',
+    'Fawn Embroidered Khaddar Suit',
+    'Charcoal Karandi Shawl 3-Piece',
+    'Mustard Block-Print Khaddar Set',
+    'Olive Wool-Blend Winter Suit',
+    'Camel Heritage Khaddar 3-Piece',
+    'Pure Linen Embroidered 3-Piece',
+    'Natural Linen Casual Suit',
+    'Breezy Linen Printed Set',
+    'Classic Linen Formal 3-Piece',
+    'Summer Linen Collection Set',
   ],
 
-  // ── PAKISTAN · Khaddar (Winter) ────────────────────────────────────────────
-  'Khaddar': [
-    '[PK] Rose Petal Khaddar Winter Suit',
-    '[PK] Fawn Embroidered Khaddar 3-Piece',
-    '[PK] Deep Blue Karandi Shawl Suit',
-    '[PK] Charcoal Khaddar Classic Set',
-    '[PK] Olive Wool-Blend Khaddar Suit',
-    '[PK] Rust Embroidered Winter Khaddar',
-    '[PK] Camel Heritage Khaddar 3-Piece',
-    '[PK] Burgundy Khaddar Shawl Collection',
-    '[PK] Mustard Block-Print Khaddar Set',
-    '[PK] Navy Karandi Formal Suit',
+  // ── 25 Ready-to-Wear ───────────────────────────────────────────────────────
+  'Ready-to-Wear': [
+    'Classic Embroidered Kurta Set',
+    'Festive Anarkali Floor-Length Gown',
+    'Casual Cotton Shalwar Kameez',
+    'Formal Silk Kurta Trouser',
+    'Printed Chiffon Shirt Trouser',
+    'Party Wear Organza Suit',
+    'Pret Cotton Kurti Set',
+    'Heritage Embroidered Pret Suit',
+    'Contemporary Silk Coord Set',
+    'Modern Georgette Fusion Kurta',
+    'Bridal Pret Embroidered Collection',
+    'Teal Chiffon Anarkali Gown',
+    'Pearl Organza Sharara Suit',
+    'Lavender Chiffon 3-Piece Pret',
+    'Emerald Silk Patiala Set',
+    'Blush Sequin Festive Kurta',
+    'Ivory Neckline Embroidered Kurta',
+    'Turquoise Mirror-Work Pret Suit',
+    'Coral Ombre Casual Kurta',
+    'Pistachio Organza Eid Suit',
+    'Midnight Velvet Formal Kurta',
+    'Aubergine Floor-Length Anarkali',
+    'Cerise Embroidered Festive Kurta',
+    'Navy Formal Palazzo Kurta',
+    'Dusty Rose Casual Pret Set',
   ],
 
-  // ── PAKISTAN · Chiffon & Silk (Festive/Formal) ────────────────────────────
-  'Chiffon': [
-    '[PK] Pearl Organza Sharara Set',
-    '[PK] Scarlet Net Gharara Suit',
-    '[PK] Teal Chiffon Anarkali Gown',
-    '[PK] Lavender Chiffon 3-Piece',
-    '[PK] Blush Palazzo Chiffon Set',
-    '[PK] Pistachio Organza Eid Sharara',
-    '[PK] Coral Ombré Chiffon Suit',
-    '[PK] Golden Chikankari Voile Suit',
-    '[PK] Aubergine Velvet Peshwas',
-    '[PK] Turquoise Georgette Festive Suit',
-    '[PK] Cerise Embroidered Chiffon Kurta',
-    '[PK] Blush Net Sequin Dupatta Suit',
+  // ── 20 Bottoms ─────────────────────────────────────────────────────────────
+  'Bottoms': [
+    'Classic Black Wide-Leg Trouser',
+    'Ivory Silk Gharara',
+    'Navy Pleated Palazzo Pants',
+    'Crimson Embroidered Sharara',
+    'Cotton Casual Shalwar',
+    'Formal Silk Churidar',
+    'Khaddar Winter Straight Trouser',
+    'Emerald Flared Gharara',
+    'Printed Chiffon Palazzo',
+    'Embroidered Net Sharara',
+    'Linen Wide-Leg Casual Trouser',
+    'Festive Gold Brocade Gharara',
+    'Minimal Cotton Cigarette Trouser',
+    'Velvet Embroidered Sharara',
+    'Silk Flared Palazzo Set',
+    'Block-Print Cotton Shalwar',
+    'Organza Layered Gharara',
+    'Formal Crepe Straight Trouser',
+    'Heritage Printed Shalwar',
+    'Premium Georgette Palazzo',
   ],
 
-  // ── PAKISTAN · Silk (Premium) ──────────────────────────────────────────────
-  'Silk': [
-    '[PK] Emerald Pure Silk Patiala Set',
-    '[PK] Midnight Velvet Shawl Suit',
-    '[PK] Eid Festive Jacquard Silk Suit',
-    '[PK] Bottle Green Silk Gharara',
-    '[PK] Ivory Raw Silk Formal Suit',
-    '[PK] Navy Raw Silk Formal Suit',
+  // ── 15 Dupattas ────────────────────────────────────────────────────────────
+  'Dupattas': [
+    'Ivory Silk Embroidered Dupatta',
+    'Chiffon Digital Floral Dupatta',
+    'Heavy Organza Bridal Dupatta',
+    'Lawn Cotton Printed Stole',
+    'Net Sequin Evening Dupatta',
+    'Georgette Phulkari Dupatta',
+    'Silk Banarasi Weave Dupatta',
+    'Sheer Chiffon Block-Print Dupatta',
+    'Embroidered Border Lawn Dupatta',
+    'Velvet Hand-Embroidered Dupatta',
+    'Mirror-Work Cotton Dupatta',
+    'Premium Pashmina Shawl Dupatta',
+    'Ombre Silk Chiffon Dupatta',
+    'Traditional Kantha Stitch Dupatta',
+    'Gota Patti Festive Dupatta',
   ],
 
-  // ── PAKISTAN · Embroidered ─────────────────────────────────────────────────
-  'Embroidered': [
-    '[PK] Sage Green Organza Pishwas',
-    '[PK] Blush Embroidered Festive Set',
-    '[PK] Turquoise Mirror-Work Kurta',
-    '[PK] Eid Embroidered Jacquard 3-Piece',
-    '[PK] Charcoal Formal Embroidered Suit',
-    '[PK] Maisha Printed Embroidered Suit',
-  ],
-
-  // ── PAKISTAN · Bridal ──────────────────────────────────────────────────────
-  'Bridal': [
-    '[PK] Regal Zardozi Bridal Lehenga',
-    '[PK] Ivory Nikkah Gharara Set',
-    '[PK] Gold Walima Chiffon Lehenga',
-    '[PK] Deep Maroon Mehndi Sharara',
-    '[PK] Copper Barat Silk Lehenga',
-    '[PK] Crimson Bridal Anarkali Gown',
-  ],
-
-  // ── PAKISTAN · Formal & Casual ─────────────────────────────────────────────
-  'Formal': [
-    '[PK] Charcoal Raw Silk Office Suit',
-    '[PK] Navy Pleated Palazzo Crepe Set',
-    '[PK] Ivory Formal Raw Silk Suit',
-    '[PK] Steel Grey Structured Kameez',
-    '[PK] Camel Formal Linen Trouser Set',
-  ],
-
-  'Casual': [
-    '[PK] Sage Garden Cotton Kurti',
-    '[PK] Indigo Block-Print Daily Kurti',
-    '[PK] Terracotta Linen Straight Kurti',
-    '[PK] Burgundy Peplum Cotton Kurti',
-    '[PK] Draped Asymmetric Cotton-Silk Kurti',
-    '[PK] Mustard Casual Pret Collection',
-  ],
-
-  // ── BANGLADESH · Saree ─────────────────────────────────────────────────────
-  'Saree': [
-    '[BD] Dhakai Jamdani Heritage Saree',
-    '[BD] Rajshahi Katan Silk Wedding Saree',
-    '[BD] Soft Muslin Everyday Saree',
-    '[BD] Bengal Tant Casual Cotton Saree',
-    '[BD] Nakshi Kantha Embroidered Saree',
-    '[BD] Eid Banarasi Fusion Silk Saree',
-    '[BD] Silk Georgette Party Saree',
-    '[BD] Bijoy Dibosh Special Tant Saree',
-    '[BD] Shitol Pati Motif Printed Saree',
-    '[BD] Traditional Dhakai Wedding Saree',
-    '[IN] Banarasi Pure Silk Bridal Saree',
-    '[IN] Chanderi Silk-Cotton Saree',
-    '[IN] Kanjivaram Temple Silk Saree',
-    '[IN] Mysore Pure Silk Crepe Saree',
-    '[IN] Paithani Peacock Motif Saree',
-    '[IN] Pochampally Ikat Cotton Saree',
-    '[IN] Sambalpuri Bandha Silk Saree',
-    '[IN] Bhagalpuri Tussar Silk Saree',
-    '[IN] Kerala Kasavu Cotton Saree',
-    '[IN] Phulkari Embroidered Saree',
-    '[IN] Patola Double-Ikat Silk Saree',
-    '[IN] Maheswari Silk-Cotton Saree',
-    '[IN] Assamese Muga Mekhela Chador',
-    '[IN] Kutch Mirror-Work Cotton Saree',
-    '[IN] Benarasi Organza Party Saree',
-    '[IN] South Indian Kanjivaram Bridal Saree',
-    '[IN] Himroo Brocade Formal Saree',
-  ],
-
-  // ── INDIA & MIXED · Lehenga ────────────────────────────────────────────────
-  'Lehenga': [
-    '[IN] Bridal Velvet Zardozi Lehenga',
-    '[IN] Rajasthani Bandhani Festive Lehenga',
-    '[IN] Pastel Organza Sangeet Lehenga',
-    '[IN] Gujarati Ghagra Choli Set',
-    '[IN] Gota Patti Georgette Lehenga',
-    '[IN] Banjara Mirror-Work Lehenga',
-    '[IN] Zardozi Bridal Sharara Choli',
-    '[IN] Indigo Chikankari Anarkali Gown',
-    '[IN] Kashmiri Sozni Embroidered Suit',
-    '[PK] Deep Maroon Silk Festive Lehenga',
-    '[PK] Ivory Net Bridal Lehenga Set',
-  ],
-
-  // ── BANGLADESH & INDIA · Panjabi/Kurta (Men's) ────────────────────────────
-  'Panjabi': [
-    '[BD] Classic White Eid Panjabi',
-    '[BD] Indigo Muslin Luxury Panjabi',
-    '[BD] Embroidered Teal Silk Panjabi',
-    '[BD] Rajshahi Katan Formal Panjabi',
-    '[BD] Chapa Printed Casual Panjabi',
-    '[BD] Cream Festive Embroidered Panjabi',
-    '[IN] Royal Brocade Wedding Sherwani',
-    '[IN] Indigo Nehru Jacket Kurta Set',
-    '[IN] White Dhoti Kurta Classic Set',
-    '[IN] Saffron Silk Festive Kurta Churidar',
-    '[IN] Ivory Sherwani Formal Set',
-    '[IN] Maroon Embroidered Wedding Kurta',
-  ],
-
-  // ── ACCESSORIES ────────────────────────────────────────────────────────────
+  // ── 15 Accessories ─────────────────────────────────────────────────────────
   'Accessories': [
-    '[PK] Silk Embroidered Dupatta',
-    '[PK] Lawn Printed Cotton Stole',
-    '[PK] Premium Pashmina Shawl',
-    '[BD] Nakshi Kantha Embroidered Stole',
-    '[BD] Muslin Hand-Print Dupatta',
-    '[IN] Banarasi Silk Dupatta',
-    '[IN] Phulkari Embroidered Dupatta',
-    '[PK] Handcrafted Embroidered Clutch',
-    '[PK] Traditional Jhumka Earrings',
-    '[IN] Oxidised Silver Earring Set',
-    '[BD] Brass Bangle Collection',
-    '[IN] Kundan Statement Necklace',
+    'Handcrafted Leather Clutch',
+    'Embroidered Velvet Evening Bag',
+    'Traditional Brass Jhumka Earrings',
+    'Oxidised Silver Choker Set',
+    'Kundan Statement Necklace',
+    'Silk Printed Scarf',
+    'Beaded Potli Bag',
+    'Gold-Tone Bangles Set',
+    'Handwoven Tote Bag',
+    'Pearl Drop Earring Set',
+    'Embroidered Coin Purse',
+    'Silver Filigree Cuff Bracelet',
+    'Leather Satchel Crossbody',
+    'Stone-Set Maang Tikka',
+    'Classic Khussa Embroidered Flats',
   ],
 }
 
@@ -276,7 +196,6 @@ function generateSlug(name: string, index: number): string {
   return (
     name
       .toLowerCase()
-      .replace(/\[pk\]|\[bd\]|\[in\]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '')
       .trim() +
@@ -286,66 +205,54 @@ function generateSlug(name: string, index: number): string {
 }
 
 function getRandomPrice(min: number, max: number): number {
+  // Multiplied by 100 so min=22 → PKR 2,200
   return Math.floor(Math.random() * (max - min + 1) + min) * 100
 }
 
-function pickRandom<T>(arr: T[], count: number): T[] {
-  const shuffled = [...arr].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, count)
+function getPriceRange(category: string): [number, number] {
+  switch (category) {
+    case 'Unstitched':    return [22, 65]
+    case 'Ready-to-Wear': return [35, 180]
+    case 'Bottoms':       return [18, 80]
+    case 'Dupattas':      return [12, 55]
+    case 'Accessories':   return [8, 45]
+    default:              return [20, 60]
+  }
 }
 
-function getSizesForCategory(category: string): string[] {
-  if (category === 'Accessories') return []
-  if (category === 'Panjabi') return MEN_SIZES
-  if (category === 'Saree') return FREE_SIZE
+function pickRandom<T>(arr: T[], count: number): T[] {
+  return [...arr].sort(() => Math.random() - 0.5).slice(0, count)
+}
+
+function getSizes(category: string): string[] {
+  if (category === 'Accessories' || category === 'Dupattas') return []
   return SIZES
 }
 
-function getPriceRangeForCategory(category: string): [number, number] {
-  switch (category) {
-    case 'Bridal':    return [250, 800]   // 25,000 – 80,000
-    case 'Lehenga':   return [120, 650]   // 12,000 – 65,000
-    case 'Silk':      return [60, 120]    // 6,000  – 12,000
-    case 'Saree':     return [35, 500]    // 3,500  – 50,000
-    case 'Chiffon':   return [55, 180]    // 5,500  – 18,000
-    case 'Embroidered': return [50, 160]  // 5,000  – 16,000
-    case 'Khaddar':   return [40, 90]     // 4,000  – 9,000
-    case 'Lawn':      return [22, 60]     // 2,200  – 6,000
-    case 'Formal':    return [45, 100]    // 4,500  – 10,000
-    case 'Panjabi':   return [35, 120]    // 3,500  – 12,000
-    case 'Accessories': return [8, 45]   // 800    – 4,500
-    case 'Casual':    return [16, 40]     // 1,600  – 4,000
-    default:          return [30, 80]     // 3,000  – 8,000
-  }
-}
-
 function buildDescription(name: string, category: string, fabric: string): string {
-  const cleanName = name.replace(/\[PK\]|\[BD\]|\[IN\]/g, '').trim()
-  const origin =
-    name.startsWith('[PK]') ? 'Pakistan' :
-    name.startsWith('[BD]') ? 'Bangladesh' : 'India'
-
-  const descriptors: Record<string, string> = {
-    Lawn:       'featuring exquisite craftsmanship and vibrant print work',
-    Khaddar:    'crafted for warmth and comfort in cooler months',
-    Chiffon:    'with delicate embroidery and a flowing, elegant silhouette',
-    Silk:       'showcasing the finest weaving traditions with a natural lustrous finish',
-    Embroidered:'adorned with intricate hand-embroidery by skilled artisans',
-    Bridal:     'a masterpiece ensemble created for life\'s most precious occasions',
-    Formal:     'tailored for refined professional and formal engagements',
-    Casual:     'designed for effortless everyday elegance',
-    Saree:      'celebrating centuries of South Asian weaving heritage',
-    Lehenga:    'a breathtaking ensemble for festive and bridal celebrations',
-    Panjabi:    'a graceful menswear piece rooted in South Asian tradition',
-    Accessories:'a carefully crafted accent to complete any ensemble',
+  const map: Record<string, string> = {
+    'Unstitched':
+      `An exquisite unstitched ensemble crafted from premium ${fabric}. ` +
+      `The ${name.toLowerCase()} comes as a complete fabric set ready to be tailored to your perfect fit. ` +
+      `Ideal for both casual and formal occasions across all seasons.`,
+    'Ready-to-Wear':
+      `Step out effortlessly in the ${name.toLowerCase()}, a luxurious ready-to-wear piece in ${fabric}. ` +
+      `Designed for the modern South Asian woman who values both comfort and elegance, ` +
+      `it transitions seamlessly from daytime events to evening gatherings.`,
+    'Bottoms':
+      `Complete your ensemble with the ${name.toLowerCase()}, crafted in fine ${fabric}. ` +
+      `The thoughtful cut and refined detailing make this an essential piece in any ` +
+      `South Asian wardrobe, pairing beautifully with both embroidered and printed tops.`,
+    'Dupattas':
+      `Add the finishing touch with the ${name.toLowerCase()}, a statement ${fabric} dupatta ` +
+      `featuring exquisite craftsmanship. Versatile enough to style with multiple outfits, ` +
+      `it elevates any look from simple to spectacular.`,
+    'Accessories':
+      `The ${name.toLowerCase()} is a beautifully crafted piece in premium ${fabric}. ` +
+      `Handcrafted by skilled artisans, it adds an authentic South Asian touch ` +
+      `to your festive or everyday look.`,
   }
-
-  return (
-    `A stunning ${category.toLowerCase()} piece from our exclusive South Asian collection, crafted in ${origin}. ` +
-    `The ${cleanName.toLowerCase()} is made from premium ${fabric.toLowerCase()}, ` +
-    `${descriptors[category] ?? 'offering timeless style and exceptional quality'}. ` +
-    `Perfect for both special occasions and refined everyday wear.`
-  )
+  return map[category] ?? `A premium ${category.toLowerCase()} piece crafted from ${fabric}.`
 }
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
@@ -360,72 +267,67 @@ async function main() {
   }
 
   const products = []
-  let imageIdx = 0
+  let imageIdx  = 0
+  let globalIdx = 0
 
-  for (const [category, names] of Object.entries(PRODUCT_NAMES)) {
-    const [priceMin, priceMax] = getPriceRangeForCategory(category)
-    const sizes = getSizesForCategory(category)
+  for (const category of CATEGORIES) {
+    const names        = PRODUCT_NAMES[category]
+    const [pMin, pMax] = getPriceRange(category)
+    const sizes        = getSizes(category)
+    const fabricPool   = FABRICS[category]
 
-    for (let i = 0; i < names.length; i++) {
-      const name = names[i]
-      const price = getRandomPrice(priceMin, priceMax)
-      const isSale = Math.random() > 0.65
-      const salePrice = isSale ? Math.floor(price * 0.8) : null
-      const fabric = FABRICS[Math.floor(Math.random() * FABRICS.length)]
-      const productColors = pickRandom(COLORS, Math.floor(Math.random() * 4) + 2)
-      const isFeatured = products.length < 16
-      const isNew = products.length < 35
+    for (const name of names) {
+      const price     = getRandomPrice(pMin, pMax)
+      const onSale    = Math.random() > 0.65
+      const salePrice = onSale ? Math.floor(price * 0.8) : null
+      const fabric    = fabricPool[Math.floor(Math.random() * fabricPool.length)]
+      const colors    = pickRandom(COLORS, Math.floor(Math.random() * 4) + 2)
 
+      // ── ONLY the fields that exist in YOUR schema ─────────────────────────
       products.push({
         name,
-        slug: generateSlug(name, products.length + 1),
+        slug:        generateSlug(name, globalIdx + 1),
         description: buildDescription(name, category, fabric),
         price,
         salePrice,
         imageUrl: UNSPLASH_IMAGES[imageIdx % UNSPLASH_IMAGES.length],
-        images: JSON.stringify([
+        images:   JSON.stringify([
           UNSPLASH_IMAGES[imageIdx % UNSPLASH_IMAGES.length],
           UNSPLASH_IMAGES[(imageIdx + 1) % UNSPLASH_IMAGES.length],
           UNSPLASH_IMAGES[(imageIdx + 2) % UNSPLASH_IMAGES.length],
         ]),
         category,
-        subCategory: name.includes('[PK]')
-          ? 'Pakistan' : name.includes('[BD]')
-          ? 'Bangladesh' : 'India',
         fabric,
-        colors: JSON.stringify(productColors),
-        sizes: JSON.stringify(sizes),
-        stock: Math.floor(Math.random() * 50) + 10,
-        isFeatured,
-        isNew,
-        isSale: !!salePrice,
+        colors:    JSON.stringify(colors),
+        sizes:     JSON.stringify(sizes),
+        stock:     Math.floor(Math.random() * 50) + 10,
+        isFeatured: globalIdx < 12,
+        isNew:      globalIdx < 30,
+        isSale:     onSale,
+        isActive:   true,
       })
 
       imageIdx++
+      globalIdx++
     }
   }
 
-  // Insert in batches
+  // Insert products one-by-one (safest for SQLite)
   for (const product of products) {
     await prisma.product.create({ data: product })
   }
 
-  // Summary
-  const byOrigin = {
-    '🇵🇰 Pakistan':   products.filter(p => p.subCategory === 'Pakistan').length,
-    '🇧🇩 Bangladesh': products.filter(p => p.subCategory === 'Bangladesh').length,
-    '🇮🇳 India':      products.filter(p => p.subCategory === 'India').length,
+  // ── Summary ──────────────────────────────────────────────────────────────
+  console.log(`\n✅ Seeded ${products.length} products successfully!\n`)
+  console.log('📦 Breakdown by category:')
+  for (const cat of CATEGORIES) {
+    const n = products.filter((p) => p.category === cat).length
+    console.log(`   ${cat.padEnd(16)} ${n} products`)
   }
-
-  console.log(`\n✅ Seeded ${products.length} products successfully!`)
-  console.log('\n📦 Origin Breakdown:')
-  Object.entries(byOrigin).forEach(([label, count]) =>
-    console.log(`   ${label}: ${count} items`)
-  )
-  console.log(`\n🏷️  Categories (${CATEGORIES.length}): ${CATEGORIES.join(', ')}`)
-  console.log(`⭐ Featured: ${products.filter(p => p.isFeatured).length}`)
-  console.log(`🆕 New: ${products.filter(p => p.isNew).length}`)
-  console.log(`🔖 On Sale: ${products.filter(p => p.isSale).length}`)
+  console.log(`\n⭐ Featured : ${products.filter((p) => p.isFeatured).length}`)
+  console.log(`🆕 New      : ${products.filter((p) => p.isNew).length}`)
+  console.log(`🔖 On Sale  : ${products.filter((p) => p.isSale).length}`)
+  console.log(`\n🏷️  Total    : ${products.length}/100`)
 }
 
 main()

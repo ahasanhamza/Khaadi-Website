@@ -43,55 +43,54 @@ export default function CheckoutPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (items.length === 0) return
-    setLoading(true)
-    setError('')
+  e.preventDefault()
+  if (items.length === 0) return
+  setLoading(true)
+  setError('')
 
-    try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: form.name,
-          customerEmail: form.email,
-          customerPhone: form.phone,
-          shippingAddress: JSON.stringify({
-            address: form.address,
-            area: form.area,
-            division: form.division,
-          }),
-          notes: form.notes,
-          paymentMethod,
-          items: items.map((i) => ({
-            productId: i.id,
-            quantity: i.quantity,
-            size: i.size,
-            color: i.color,
-            price: i.price,
-          })),
-          subtotal,
-          shippingCost: shipping,
-          total,
-        }),
-      })
+  try {
+    const res = await fetch('/api/orders', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    customerName: form.name,
+    customerEmail: form.email,
+    customerPhone: form.phone,
 
-      const data = await res.json()
+    // Use `address` to match Prisma
+    address: `${form.address}, ${form.area}, ${form.division}`,
 
-      if (!res.ok) throw new Error(data.error || 'Order failed')
+    notes: form.notes,
+    paymentMethod,
+    items: items.map((i) => ({
+      productId: i.id,
+      quantity: i.quantity,
+      size: i.size,
+      color: i.color,
+      price: i.price,
+    })),
+    subtotal,
+    shippingCost: shipping,
+    total,
+  }),
+})
 
-      if (paymentMethod === 'SSLCommerz' && data.paymentUrl) {
-        window.location.href = data.paymentUrl
-      } else {
-        clearCart()
-        router.push(`/checkout/success?order=${data.orderNumber}`)
-      }
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.error || 'Order failed')
+
+    if (paymentMethod === 'SSLCommerz' && data.paymentUrl) {
+      window.location.href = data.paymentUrl
+    } else {
+      clearCart()
+      router.push(`/checkout/success?order=${data.orderNumber}`)
     }
+  } catch (err: any) {
+    setError(err.message || 'Something went wrong. Please try again.')
+  } finally {
+    setLoading(false)
   }
+}
 
   if (items.length === 0) {
     return (
